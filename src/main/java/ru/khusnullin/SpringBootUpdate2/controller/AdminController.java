@@ -7,11 +7,8 @@ import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.khusnullin.SpringBootUpdate2.model.User;
-import ru.khusnullin.SpringBootUpdate2.service.RoleService;
 import ru.khusnullin.SpringBootUpdate2.service.UserService;
 
-import java.util.HashSet;
-import java.util.Set;
 
 @Controller
 @RequestMapping("/admin/users")
@@ -19,12 +16,9 @@ public class AdminController {
 
     private final UserService userService;
 
-    private final RoleService roleService;
-
     @Autowired
-    public AdminController(UserService userService, RoleService roleService) {
+    public AdminController(UserService userService) {
         this.userService = userService;
-        this.roleService = roleService;
     }
 
     @GetMapping()
@@ -50,12 +44,7 @@ public class AdminController {
         if (bindingResult.hasErrors()) {
             return "admins/create";
         }
-        if (roleAdmin.equals("YES")) {
-            user.setRoles(new HashSet<>(Set.of(roleService.getRoleByName("ROLE_ADMIN"), roleService.getRoleByName("ROLE_USER"))));
-        } else {
-            user.setRoles(new HashSet<>(Set.of(roleService.getRoleByName("ROLE_USER"))));
-        }
-        userService.addUser(user);
+        userService.addUserByAdmin(user, roleAdmin);
         return "redirect:/admin/users";
     }
 
@@ -78,13 +67,8 @@ public class AdminController {
         if (bindingResult.hasErrors()) {
             return "admins/edit";
         }
-        if (roleAdmin.equals("YES")) {
-            user.setRoles(new HashSet<>(Set.of(roleService.getRoleByName("ROLE_ADMIN"), roleService.getRoleByName("ROLE_USER"))));
-        } else {
-            user.setRoles(new HashSet<>(Set.of(roleService.getRoleByName("ROLE_USER"))));
-        }
-        userService.updateUser(user);
-        return "redirect:/admin/users";
+        userService.updateUserByAdmin(user, roleAdmin);
+        return "redirect:/admin/users?id=" + id;
     }
 
 }

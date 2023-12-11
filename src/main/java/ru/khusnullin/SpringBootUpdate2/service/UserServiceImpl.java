@@ -13,9 +13,7 @@ import ru.khusnullin.SpringBootUpdate2.model.Role;
 import ru.khusnullin.SpringBootUpdate2.model.User;
 import ru.khusnullin.SpringBootUpdate2.repository.UserRepository;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,11 +21,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final UserRepository userRepository;
 
+    private final RoleService roleService;
+
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, RoleService roleService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -35,6 +36,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Transactional
     public void addUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(new HashSet<>(Set.of(roleService.getRoleByName("ROLE_USER"))));
+        userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void addUserByAdmin(User user, String roleAdmin) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(rolesImpl(roleAdmin));
         userRepository.save(user);
     }
 
@@ -64,7 +74,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     @Transactional
-    public void updateUser(User user) {
+    public void updateUserByAdmin(User user, String roleAdmin) {
         Optional<User> userById = userRepository.findById(user.getId());
         if (userById.isPresent()) {
             User userOld = userById.get();
@@ -73,7 +83,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             userOld.setName(user.getName());
             userOld.setLastname(user.getLastname());
             userOld.setAge(user.getAge());
-            userOld.setRoles(user.getRoles());
+            userOld.setRoles(rolesImpl(roleAdmin));
             userRepository.save(userOld);
         } else {
             throw new UsernameNotFoundException(String.format("User %s with %d id not found", user, user.getId()));
@@ -87,7 +97,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = getUserByEmail(username);
         if (user == null) {
@@ -100,4 +110,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles) {
         return roles.stream().map(r -> new SimpleGrantedAuthority(r.getName())).collect(Collectors.toList());
     }
+
+    private Set<Role> rolesImpl(String roleAdmin) {
+        if (roleAdmin.equals("YES")) {
+            return new HashSet<>(Set.of(roleService.getRoleByName("ROLE_ADMIN"), roleService.getRoleByName("ROLE_USER")));
+        } else {
+            return new HashSet<>(Set.of(roleService.getRoleByName("ROLE_USER")));
+        }
+    }
+
 }

@@ -7,14 +7,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import ru.khusnullin.SpringBootUpdate2.model.Role;
 import ru.khusnullin.SpringBootUpdate2.model.User;
-import ru.khusnullin.SpringBootUpdate2.service.RoleService;
 import ru.khusnullin.SpringBootUpdate2.service.UserService;
 
 import javax.validation.Valid;
-import java.util.HashSet;
-import java.util.Set;
 
 @Controller
 @RequestMapping("/auth")
@@ -22,12 +18,9 @@ public class AuthenticationController {
 
     private final UserService userService;
 
-    private final RoleService roleService;
-
     @Autowired
-    public AuthenticationController(UserService userService, RoleService roleService) {
+    public AuthenticationController(UserService userService) {
         this.userService = userService;
-        this.roleService = roleService;
     }
 
 
@@ -46,8 +39,6 @@ public class AuthenticationController {
         if (bindingResult.hasErrors() || userService.getUserByEmail(user.getEmail()) != null) {
             return "authentication/registration";
         }
-        Role role =roleService.getRoleByName("ROLE_USER");
-        user.setRoles(new HashSet<>(Set.of(role)));
         userService.addUser(user);
         return "redirect:/auth/login";
     }
