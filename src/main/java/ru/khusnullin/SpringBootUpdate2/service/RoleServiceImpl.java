@@ -7,6 +7,7 @@ import ru.khusnullin.SpringBootUpdate2.model.Role;
 import ru.khusnullin.SpringBootUpdate2.repository.RoleRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RoleServiceImpl implements RoleService{
@@ -41,5 +42,16 @@ public class RoleServiceImpl implements RoleService{
     @Transactional(readOnly = true)
     public Role getRoleByName(String name) {
         return roleRepository.getRoleByName(name);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Role getRoleById(Long id) {
+        Optional<Role> role = roleRepository.findById(id);
+        if (role.isPresent()) {
+            return role.get();
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 }
