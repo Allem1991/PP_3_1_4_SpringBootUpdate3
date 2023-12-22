@@ -1,64 +1,133 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<html lang="en">
 <head>
-    <!-- Обязательные мета-теги -->
+    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
+
     <style>
-        body {
-            background-color: #f8f9fa;
+        /* Custom styles for better alignment */
+        .user-panel {
+            background-color: #343a40;  /* Dark gray background color */
+            color: #ffffff;  /* White text color */
+            padding: 15px;  /* Padding for the panel */
+            display: flex;  /* Use flexbox for layout */
+            justify-content: space-between;  /* Space between elements */
+            align-items: center;  /* Center align items vertically */
+            font-weight: bold;  /* Bold font */
+            font-size: 20px;  /* Increased font size */
         }
 
-        .user-info {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #fff;
+        .user-panel span {
+            margin-right: 10px;  /* Add right margin between elements */
+        }
+
+        .user-panel .roles {
+            display: flex;  /* Use flexbox for roles */
+            align-items: center;  /* Center align roles vertically */
+            margin-right: 20px;  /* Add right margin between email and roles */
+        }
+
+        .btn-light {
+            font-weight: bold;
+        }
+
+        .user-title {
+            font-size: 20px;  /* Increased font size */
+            background-color: #cccccc;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-top: 50px;
+            font-weight: bold;
+            text-align: center;  /* Center align the text */
+            margin-bottom: 20px;  /* Add some bottom margin */
         }
 
-        h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
+        .table-header {
+            font-size: 20px;  /* Increased font size */
+            font-weight: bold;
+            text-align: center;  /* Center align the text */
         }
 
-        hr {
-            margin-top: 20px;
-            margin-bottom: 20px;
+        .column-header {
+            font-weight: bold;
         }
 
-        form {
-            display: inline-block;
-            margin-right: 10px;
+        .table-cell {
+            vertical-align: middle;
         }
+
     </style>
 
-    <title>User</title>
+    <title>User page</title>
 </head>
 <body>
 
-<div class="user-info">
-    <h1 th:text="'Email: ' + ${user.getEmail()}"></h1>
-    <h1 th:text="'Name: ' + ${user.getName()}"></h1>
-    <h1 th:text="'Lastname: ' + ${user.getLastname()}"></h1>
-    <h1 th:text="'Age: ' + ${user.getAge()}"></h1>
-
-    <br/>
-    <hr/>
-
-    <a href="/logout">Logout</a>
-
+<div class="user-panel">
+    <span th:text="${#httpServletRequest.remoteUser}"></span> <!-- Display logged-in user's email -->
+    <div class="roles">
+        <span>Roles:</span>
+        <span th:each="role : ${#authentication.getAuthorities()}"
+              th:class="${role.authority == 'ROLE_ADMIN'} ? 'badge badge-danger role-badge' : 'badge badge-info role-badge'"
+              th:text="${role.authority}"></span> <!-- Display user roles -->
+    </div>
+    <a href="/logout" class="btn btn-light">Logout</a> <!-- Logout button -->
 </div>
 
-<!-- Дополнительные JavaScript-файлы -->
-<!-- Сначала jQuery, затем Popper.js, затем Bootstrap JS -->
+<h1 class="user-title">User information-page</h1>
+
+<div class="container-fluid">
+    <div class="tab-content">
+        <!-- Users Table Tab -->
+        <div class="tab-pane fade show active" id="usersTable">
+            <div class="jumbotron">
+                <h1 class="display-4 table-header">About user</h1>
+                <hr class="my-4">
+                <div class="d-flex flex-column">
+                    <!-- Table Headers -->
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col column-header">ID</div>
+                                <div class="col column-header">Name</div>
+                                <div class="col column-header">Lastname</div>
+                                <div class="col column-header">Age</div>
+                                <div class="col column-header">Email</div>
+                                <div class="col column-header">Roles</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Table Data -->
+                    <th:block>
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col table-cell" th:text="${user.getId()}"></div>
+                                    <div class="col table-cell" th:text="${user.getName()}"></div>
+                                    <div class="col table-cell" th:text="${user.getLastname()}"></div>
+                                    <div class="col table-cell" th:text="${user.getAge()}"></div>
+                                    <div class="col table-cell" th:text="${user.getEmail()}"></div>
+                                    <div class="col table-cell">
+                                        <span th:each="role : ${user.getRoles()}">
+                                            <span th:if="${role.name == 'ROLE_ADMIN'}" class="badge badge-danger" th:text="${role.name}"></span>
+                                            <span th:if="${role.name != 'ROLE_ADMIN'}" class="badge badge-info" th:text="${role.name}"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </th:block>
+                </div>
+                <hr class="my-4">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>

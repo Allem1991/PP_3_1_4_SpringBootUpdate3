@@ -14,45 +14,76 @@
       background-color: #f8f9fa;
     }
 
-    form {
-      max-width: 600px;
-      margin: 0 auto;
+    .edit-form {
+      max-width: 400px;
+      margin: auto;
       background-color: #fff;
       padding: 20px;
-      border-radius: 8px;
+      border-radius: 10px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       margin-top: 50px;
     }
 
     label {
       font-weight: bold;
+      margin-bottom: 5px;
+      display: block;
     }
 
-    input[type="text"] {
+    input {
       width: 100%;
-      padding: 8px;
-      margin-top: 6px;
+      padding: 10px;
+      margin-bottom: 15px;
       box-sizing: border-box;
-      border: 1px solid #ced4da;
+      border: 1px solid #ccc;
       border-radius: 4px;
     }
 
     input[type="submit"] {
       background-color: #007bff;
       color: #fff;
-      padding: 10px 20px;
+      cursor: pointer;
+      padding: 12px;
       border: none;
       border-radius: 4px;
-      cursor: pointer;
     }
 
     input[type="submit"]:hover {
       background-color: #0056b3;
     }
 
-    hr {
-      margin-top: 20px;
-      margin-bottom: 20px;
+    .cancel-form input[type="submit"] {
+      background-color: #cccccc;
+      color: #343a40;
+      cursor: pointer;
+      padding: 12px;
+      border: none;
+      border-radius: 4px;
+    }
+
+    .cancel-form input[type="submit"]:hover {
+      background-color: #ced4da;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    div.error {
+      color: #ff0000;
+      margin-top: 5px;
+    }
+
+    .edit-title {
+      font-size: 30px;  /* Increased font size */
+      background-color: #cccccc;
+      padding: 40px;
+      font-weight: bold;
+      text-align: center;  /* Center align the text */
+      margin-bottom: 20px;  /* Add some bottom margin */
     }
   </style>
 
@@ -60,52 +91,58 @@
 </head>
 <body>
 
-<form th:method="POST" th:action="@{/admin/users(id=${userEdit.getId()})}" th:object="${userEdit}">
-  <h1 class="text-center mb-4">Edit User</h1>
+<h1 class="edit-title">Edit user</h1>
 
-  <div class="form-group">
-    <label for="email">Enter Email:</label>
-    <input type="text" th:field="*{email}" id="email" class="form-control">
-    <div style="color: red" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
-  </div>
+<div class="edit-form">
+  <form th:method="POST" th:action="@{/admin/users(id=${userEdit.getId()})}" th:object="${userEdit}">
+    <div class="form-group">
+      <label for="email">Enter Email:</label>
+      <input type="text" th:field="*{email}" id="email" class="form-control">
+      <div class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+    </div>
 
-  <div class="form-group">
-    <label for="name">Enter Name:</label>
-    <input type="text" th:field="*{name}" id="name" class="form-control">
-    <div style="color: red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
-  </div>
+    <div class="form-group">
+      <label for="name">Enter Name:</label>
+      <input type="text" th:field="*{name}" id="name" class="form-control">
+      <div class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+    </div>
 
-  <div class="form-group">
-    <label for="lastname">Enter Lastname:</label>
-    <input type="text" th:field="*{lastname}" id="lastname" class="form-control">
-    <div style="color: red" th:if="${#fields.hasErrors('lastname')}" th:errors="*{lastname}"></div>
-  </div>
+    <div class="form-group">
+      <label for="lastname">Enter Lastname:</label>
+      <input type="text" th:field="*{lastname}" id="lastname" class="form-control">
+      <div class="error" th:if="${#fields.hasErrors('lastname')}" th:errors="*{lastname}"></div>
+    </div>
 
-  <div class="form-group">
-    <label for="age">Enter Age:</label>
-    <input type="text" th:field="*{age}" id="age" class="form-control">
-    <div style="color: red" th:if="${#fields.hasErrors('age')}" th:errors="*{age}"></div>
-  </div>
+    <div class="form-group">
+      <label for="age">Enter Age:</label>
+      <input type="text" th:field="*{age}" id="age" class="form-control">
+      <div class="error" th:if="${#fields.hasErrors('age')}" th:errors="*{age}"></div>
+    </div>
 
-  <div class="form-group">
-    <label for="password">Enter Password:</label>
-    <input type="password" th:field="*{password}" id="password" class="form-control">
-    <div style="color: red" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
-  </div>
+    <div class="form-group">
+      <label for="password">Enter Password:</label>
+      <input type="password" th:field="*{password}" id="password" class="form-control">
+      <div class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+    </div>
 
-  <div class="form-group">
-    <label for="roles">Select Roles:</label>
-    <select th:field="*{roles}" id="roles" class="form-control" multiple="multiple">
-      <option th:each="role : ${allRoles}" th:value="${role}" th:text="${role.name}" th:selected="${userEdit.roles.contains(role)}"></option>
-    </select>
-  </div>
+    <div class="form-group">
+      <label for="roles">Select Roles:</label>
+      <select th:field="*{roles}" id="roles" class="form-control" multiple="multiple">
+        <option th:each="role : ${allRoles}" th:value="${role}" th:text="${role.name}" th:selected="${userEdit.roles.contains(role)}"></option>
+      </select>
+    </div>
 
-  <hr>
+    <hr>
 
-  <div class="text-center">
-    <input type="submit" value="Save Changes" class="btn btn-primary">
-  </div>
-</form>
+    <div class="text-center">
+      <input type="submit" value="Save Changes" class="btn btn-primary">
+    </div>
+  </form>
+
+  <form class="cancel-form" th:method="GET" th:action="@{/admin/users}">
+    <input type="submit" value="Cancel" />
+  </form>
+</div>
 
 <!-- Дополнительные JavaScript-файлы -->
 <!-- Сначала jQuery, затем Popper.js, затем Bootstrap JS -->

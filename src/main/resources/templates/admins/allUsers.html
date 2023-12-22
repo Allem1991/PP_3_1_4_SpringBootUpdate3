@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<html lang="en">
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -9,42 +8,339 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-    <title>All users</title>
+
+    <style>
+        /* Custom styles for better alignment */
+        .admin-panel {
+            background-color: #343a40;  /* Dark gray background color */
+            color: #ffffff;  /* White text color */
+            padding: 15px;  /* Padding for the panel */
+            display: flex;  /* Use flexbox for layout */
+            justify-content: space-between;  /* Space between elements */
+            align-items: center;  /* Center align items vertically */
+            font-weight: bold;  /* Bold font */
+            font-size: 20px;  /* Increased font size */
+        }
+
+        .admin-panel span {
+            margin-right: 10px;  /* Add right margin between elements */
+        }
+
+        .admin-panel .roles {
+            display: flex;  /* Use flexbox for roles */
+            align-items: center;  /* Center align roles vertically */
+            margin-right: 20px;  /* Add right margin between email and roles */
+        }
+
+        .admin-panel .roles .role-badge {
+            margin-right: 5px;  /* Add right margin between role badges */
+        }
+
+        .roles .badge-danger {
+            background-color: #dc3545;  /* Red background for ROLE_ADMIN */
+        }
+
+        .btn-light {
+            font-weight: bold;
+        }
+
+        .admin-title {
+            font-size: 20px;  /* Increased font size */
+            background-color: #cccccc;
+            padding: 20px;
+            font-weight: bold;
+            text-align: center;  /* Center align the text */
+            margin-bottom: 20px;  /* Add some bottom margin */
+        }
+
+        .nav-tabs {
+            font-weight: bold;
+        }
+
+        .table-header {
+            font-size: 20px;  /* Increased font size */
+            font-weight: bold;
+            text-align: center;  /* Center align the text */
+        }
+
+        .new-user-header {
+            font-size: 20px;  /* Decreased font size */
+            font-weight: bold;
+            text-align: center;  /* Center align the text */
+        }
+
+        .column-header {
+            font-weight: bold;
+        }
+
+        .table-cell {
+            vertical-align: middle;
+        }
+
+        .new-user-tab form {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+
+        .new-user-tab label {
+            font-weight: bold;
+        }
+
+        .new-user-tab input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 6px;
+            box-sizing: border-box;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+
+        .new-user-tab input[type="submit"] {
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .new-user-tab input[type="submit"]:hover {
+            background-color: #218838;
+        }
+
+        .new-user-tab hr {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .delete-modal-content {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .delete-modal-body p {
+            margin-bottom: 10px;
+        }
+
+        .delete-modal-body span {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .delete-modal-body input[type="text"],
+        .delete-modal-body select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            background-color: #f8f9fa; /* Background color as per Bootstrap */
+            pointer-events: none; /* Disable pointer events */
+        }
+
+        .delete-modal-footer {
+            padding: 10px 20px;
+        }
+
+        .delete-modal-title {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+    </style>
+
+    <title>Admin Panel</title>
 </head>
 <body>
-<div class="container">
-    <div class="jumbotron">
-        <h1 class="display-4">All Users</h1>
-        <hr class="my-4">
 
-        <div class="d-flex flex-column">
-            <th:block th:each="user : ${users}">
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title" th:text="${user.getEmail()}"></h5>
-                        <p class="card-text">
-                            Roles:
-                            <span th:each="role : ${user.getRoles()}">
-                                <span th:if="${role.name == 'ROLE_ADMIN'}" class="badge badge-danger" th:text="${role.name}"></span>
-                                <span th:if="${role.name != 'ROLE_ADMIN'}" class="badge badge-info" th:text="${role.name}"></span>
-                            </span>
-                        </p>
-                        <a th:href="@{/admin/users(id=${user.getId()})}" class="btn btn-primary">View Profile</a>
-                    </div>
-                </div>
-            </th:block>
-        </div>
-
-        <hr class="my-4">
-
-        <div class="text-center">
-            <form th:method="GET" th:action="@{/admin/users/new}">
-                <button type="submit" class="btn btn-success btn-lg">Create New User</button>
-            </form>
-        </div>
-
-        <a href="/logout">Logout</a>
+<div class="admin-panel">
+    <span th:text="${#httpServletRequest.remoteUser}"></span> <!-- Display logged-in user's email -->
+    <div class="roles">
+        <span>Roles:</span>
+        <span th:each="role : ${#authentication.getAuthorities()}"
+              th:class="${role.authority == 'ROLE_ADMIN'} ? 'badge badge-danger role-badge' : 'badge badge-info role-badge'"
+              th:text="${role.authority}"></span> <!-- Display user roles -->
     </div>
+    <a href="/logout" class="btn btn-light">Logout</a> <!-- Logout button -->
+</div>
+
+<h1 class="admin-title">Admin Panel</h1>
+
+<div class="container-fluid">
+    <ul class="nav nav-tabs" id="adminTabs">
+        <li class="nav-item">
+            <a class="nav-link active" id="usersTableTab" data-toggle="tab" href="#usersTable">Users Table</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="createUserTab" data-toggle="tab" href="#createUser">New User</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <!-- Users Table Tab -->
+        <div class="tab-pane fade show active" id="usersTable">
+            <div class="jumbotron">
+                <h1 class="display-4 table-header">All users</h1>
+                <hr class="my-4">
+                <div class="d-flex flex-column">
+                    <!-- Table Headers -->
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col column-header">ID</div>
+                                <div class="col column-header">Name</div>
+                                <div class="col column-header">Lastname</div>
+                                <div class="col column-header">Age</div>
+                                <div class="col column-header">Email</div>
+                                <div class="col column-header">Roles</div>
+                                <div class="col column-header">Edit</div>
+                                <div class="col column-header">Delete</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Table Data -->
+                    <th:block th:each="user : ${users}">
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col table-cell" th:text="${user.getId()}"></div>
+                                    <div class="col table-cell" th:text="${user.getName()}"></div>
+                                    <div class="col table-cell" th:text="${user.getLastname()}"></div>
+                                    <div class="col table-cell" th:text="${user.getAge()}"></div>
+                                    <div class="col table-cell" th:text="${user.getEmail()}"></div>
+                                    <div class="col table-cell">
+                                        <span th:each="role : ${user.getRoles()}">
+                                            <span th:if="${role.name == 'ROLE_ADMIN'}" class="badge badge-danger" th:text="${role.name}"></span>
+                                            <span th:if="${role.name != 'ROLE_ADMIN'}" class="badge badge-info" th:text="${role.name}"></span>
+                                        </span>
+                                    </div>
+                                    <div class="col table-cell">
+                                        <form th:method="GET" th:action="@{/admin/users/edit}">
+                                            <input type="hidden" name="id" th:value="${user.getId()}" />
+                                            <button type="submit" class="btn btn-warning">Edit</button>
+                                        </form>
+                                    </div>
+                                    <div class="col table-cell">
+                                        <button type="button" class="btn btn-danger" data-toggle="modal" th:data-target="'#deleteUserModal' + ${user.getId()}" data-userid="${user.getId()}">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </th:block>
+                    <!--Модальное окно для удаления-->
+                    <th:block th:each="user : ${users}">
+                        <div class="modal fade" th:id="'deleteUserModal' + ${user.getId()}" tabindex="-1" role="dialog" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content delete-modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title delete-modal-title" id="deleteUserModalLabel">Delete this user?</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body delete-modal-body">
+                                        <span>ID:</span>
+                                        <input type="text" th:value="${user.getId()}" readonly>
+                                        <span>Email:</span>
+                                        <input type="text" th:value="${user.getEmail()}" readonly>
+                                        <span>Name:</span>
+                                        <input type="text" th:value="${user.getName()}" readonly>
+                                        <span>Lastname:</span>
+                                        <input type="text" th:value="${user.getLastname()}" readonly>
+                                        <span>Age:</span>
+                                        <input type="text" th:value="${user.getAge()}" readonly>
+                                        <span>Roles:</span>
+                                        <select class="form-control" multiple="multiple">
+                                            <option th:each="role : ${allRoles}" th:value="${role}" th:text="${role.getName()}" th:selected="${user.getRoles().contains(role)}"></option>
+                                        </select>
+                                    </div>
+                                    <div class="modal-footer delete-modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                        <form th:method="POST" th:action="@{/admin/users/delete(id=${user.getId()})}">
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </th:block>
+                    <!--Тут было модальное окно для изменения пользователя, но оно не отрабатывало правильно, лежит в test.html-->
+                </div>
+                <hr class="my-4">
+            </div>
+        </div>
+
+
+
+        <!-- Create New User Tab -->
+        <div class="tab-pane fade" id="createUser">
+            <div class="jumbotron new-user-tab">
+                <h1 class="display-4 new-user-header">Create New User</h1>
+                <hr class="my-4">
+
+                <form th:method="POST" th:action="@{/admin/users}" th:object="${newUser}">
+
+                    <div class="form-group">
+                        <label for="email">Enter Email:</label>
+                        <input type="text" th:field="*{email}" id="email" class="form-control">
+                        <div style="color: red" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">Enter Name:</label>
+                        <input type="text" th:field="*{name}" id="name" class="form-control">
+                        <div style="color: red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastname">Enter Lastname:</label>
+                        <input type="text" th:field="*{lastname}" id="lastname" class="form-control">
+                        <div style="color: red" th:if="${#fields.hasErrors('lastname')}" th:errors="*{lastname}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="age">Enter Age:</label>
+                        <input type="text" th:field="*{age}" id="age" class="form-control">
+                        <div style="color: red" th:if="${#fields.hasErrors('age')}" th:errors="*{age}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Enter Password:</label>
+                        <input type="password" th:field="*{password}" id="password" class="form-control">
+                        <div style="color: red" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="roles">Select Roles:</label>
+                        <select th:field="*{roles}" id="roles" class="form-control" multiple="multiple">
+                            <option th:each="role : ${allRoles}" th:value="${role}" th:text="${role.name}"></option>
+                        </select>
+                    </div>
+
+                    <hr>
+
+                    <div class="text-center">
+                        <input type="submit" value="Create" class="btn btn-success">
+                    </div>
+                </form>
+
+                <hr class="my-4">
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <!-- Optional JavaScript -->

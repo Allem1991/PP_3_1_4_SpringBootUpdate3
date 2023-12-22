@@ -6,14 +6,12 @@ import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import ru.khusnullin.SpringBootUpdate2.model.Role;
 import ru.khusnullin.SpringBootUpdate2.model.User;
 import ru.khusnullin.SpringBootUpdate2.service.RoleService;
 import ru.khusnullin.SpringBootUpdate2.service.UserService;
 import ru.khusnullin.SpringBootUpdate2.utils.RoleConverter;
 
 import javax.validation.Valid;
-import java.util.List;
 
 
 @Controller
@@ -36,30 +34,18 @@ public class AdminController {
 
 
     @GetMapping()
-    public String printAllUsers(ModelMap model) {
+    public String printAllUsers(ModelMap model, @ModelAttribute("newUser") User user) {
         model.addAttribute("users", userService.listUsers());
+        model.addAttribute("allRoles", roleService.getRoles());
         return "admins/allUsers";
     }
 
-    @GetMapping(params = "id")
-    public String printUser(@RequestParam(value = "id", required = false) long id, ModelMap model) {
-        model.addAttribute("user", userService.getUserById(id));
-        return "admins/user";
-    }
-
-    @GetMapping("/new")
-    public String getCreatePage(@ModelAttribute("user") User user, ModelMap model) {
-        List<Role> allRoles = roleService.getRoles();
-        model.addAttribute("allRoles", allRoles);
-        return "admins/create";
-    }
-
     @PostMapping()
-    public String createUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult, ModelMap model) {
+    public String createUser(@ModelAttribute("newUser") @Valid User user, BindingResult bindingResult, ModelMap model) {
         if (bindingResult.hasErrors()) {
-            List<Role> allRoles = roleService.getRoles();
-            model.addAttribute("allRoles", allRoles);
-            return "admins/create";
+            model.addAttribute("users", userService.listUsers());
+            model.addAttribute("allRoles", roleService.getRoles());
+            return "admins/allUsers";
         }
         userService.addUser(user);
         return "redirect:/admin/users";
@@ -73,22 +59,21 @@ public class AdminController {
 
     @GetMapping(value = "/edit", params = "id")
     public String getEditPage(@RequestParam(value = "id", required = false) long id, ModelMap model) {
-        List<Role> allRoles = roleService.getRoles();
         model.addAttribute("userEdit", userService.getUserById(id));
-        model.addAttribute("allRoles", allRoles);
+        model.addAttribute("allRoles", roleService.getRoles());
         return "admins/edit";
     }
 
     @PostMapping(params = "id")
     public String editUser(@RequestParam(value = "id", required = false) long id, ModelMap model,
-                           @ModelAttribute("userEdit") @Valid User user, BindingResult bindingResult) {
+                           @ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            List<Role> allRoles = roleService.getRoles();
-            model.addAttribute("allRoles", allRoles);
-            return "admins/edit";
+            model.addAttribute("users", userService.listUsers());
+            model.addAttribute("allRoles", roleService.getRoles());
+            return "admins/allUsers";
         }
         userService.updateUser(user);
-        return "redirect:/admin/users?id=" + id;
+        return "redirect:/admin/users";
     }
 
 }
